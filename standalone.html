@@ -4,12 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cinematic Horror Story Generator - Standalone</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Roboto Mono', monospace;
+            background-color: #111827;
+            color: #d1d5db;
+            line-height: 1.6;
         }
+
+        .container {
+            max-width: 64rem;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(20, 184, 166, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #2dd4bf, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            max-width: 48rem;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            text-align: center;
+        }
+
+        .generate-btn {
+            background-color: #14b8a6;
+            color: #111827;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.2);
+            transition: all 0.3s ease;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background-color: #0d9488;
+            transform: scale(1.05);
+        }
+
+        .generate-btn:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .loading-container {
+            margin-top: 2rem;
+        }
+
         .spinner {
             border: 4px solid transparent;
             border-top: 4px solid #14b8a6;
@@ -18,17 +90,275 @@
             width: 64px;
             height: 64px;
             animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .loading-text {
+            margin-top: 1rem;
+            font-size: 1.125rem;
+            color: #5eead4;
+        }
+
+        .loading-subtext {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .error-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(127, 29, 29, 0.5);
+            border: 1px solid #991b1b;
+            color: #fca5a5;
+            border-radius: 0.5rem;
+        }
+
+        .story-container {
+            margin-top: 2.5rem;
+            text-align: left;
+            background-color: rgba(17, 24, 39, 0.5);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 2px solid rgba(20, 184, 166, 0.3);
+        }
+
+        .story-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #374151;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+            background-color: rgba(31, 41, 55, 0.5);
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            width: 100%;
+            padding: 1rem;
+            background-color: #1f2937;
+            border: none;
+            color: #5eead4;
+            font-weight: bold;
+            font-size: 1.25rem;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Roboto Mono', monospace;
+            transition: background-color 0.2s;
+        }
+
+        .section-header:hover {
+            background-color: rgba(55, 65, 81, 0.5);
+        }
+
+        .section-number {
+            color: #6b7280;
+            margin-right: 0.5rem;
+        }
+
+        .section-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn {
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: #5eead4;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #4b5563;
+        }
+
+        .section-arrow {
+            color: #5eead4;
+            transition: transform 0.3s;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .section-arrow.open {
+            transform: rotate(90deg);
+        }
+
+        .section-content {
+            padding: 1.5rem;
+            border-top: 1px solid #374151;
+            display: none;
+        }
+
+        .section-content.open {
+            display: block;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #22d3ee;
+        }
+
+        .narration-line {
+            margin-bottom: 1rem;
+        }
+
+        .scene-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+        }
+
+        .scene-item:last-child {
+            border-bottom: none;
+        }
+
+        .scene-title {
+            font-weight: bold;
+            color: #22d3ee;
+        }
+
+        .scene-description {
+            color: #9ca3af;
+        }
+
+        .lens-info {
+            color: #5eead4;
+            font-weight: 600;
+        }
+
+        .prompt-box {
+            margin-bottom: 1rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.875rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .prompt-label {
+            font-weight: bold;
+            color: #22d3ee;
+        }
+
+        .prompt-text {
+            color: #d1d5db;
+            margin: 0.25rem 0;
+        }
+
+        .param-text {
+            color: #5eead4;
+        }
+
+        ul {
+            list-style-position: inside;
+            color: #9ca3af;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        ol {
+            list-style-position: inside;
+            padding-left: 1rem;
+            color: #9ca3af;
+        }
+
+        .disclaimer {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: #0891b2;
+            color: #e5e7eb;
+            border: none;
+            cursor: pointer;
+            font-family: 'Roboto Mono', monospace;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background-color: #0e7490;
+        }
+
+        .hashtags {
+            color: #67e8f9;
+            word-wrap: break-word;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #4b5563;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.875rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-300">
-    <div id="root"></div>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Cinematic Horror Story Generator</h1>
+            <p class="subtitle">Produce a studio-ready deliverable for your next TikTok horror story.</p>
+        </header>
 
-    <script type="module">
+        <div class="main-content">
+            <button id="generateBtn" class="generate-btn">Generate Story Script</button>
+            
+            <div id="loadingContainer" class="loading-container" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">Generating Cinematic Script...</p>
+                <p class="loading-subtext">This may take a moment.</p>
+            </div>
+
+            <div id="errorContainer" style="display: none;"></div>
+        </div>
+
+        <div id="storyContainer" style="display: none;"></div>
+
+        <footer>
+            <p>Powered by Google Gemini. Designed for cinematic professionals.</p>
+        </footer>
+    </div>
+
+    <script>
         // ========== CONFIGURATION ==========
         // IMPORTANT: Replace 'YOUR_API_KEY_HERE' with your actual Gemini API key
         const HARDCODED_API_KEY = 'YOUR_API_KEY_HERE';
@@ -245,282 +575,269 @@ Follow these constraints for the content:
             };
         }
 
-        // ========== UI COMPONENTS ==========
-        function App() {
-            const [storyData, setStoryData] = React.useState(null);
-            const [isLoading, setIsLoading] = React.useState(false);
-            const [error, setError] = React.useState(null);
+        // ========== UI FUNCTIONS ==========
+        function downloadTextAsFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
 
-            const handleGenerate = async () => {
-                setIsLoading(true);
-                setError(null);
-                setStoryData(null);
-
-                try {
-                    const story = await generateHorrorStory();
-                    setStoryData(story);
-                } catch (err) {
-                    setError(err.message);
-                    console.error(err);
-                } finally {
-                    setIsLoading(false);
+        function createSection(title, sectionNumber, icon, content, downloadData) {
+            const sectionId = `section-${sectionNumber}`;
+            const section = document.createElement('div');
+            section.className = 'section';
+            
+            const header = document.createElement('button');
+            header.className = 'section-header';
+            header.innerHTML = `
+                <span>
+                    <span class="section-number">${String(sectionNumber).padStart(2, '0')}</span>
+                    ${icon} ${title}
+                </span>
+                <div class="section-actions">
+                    ${downloadData ? '<button class="download-btn">⬇️</button>' : ''}
+                    <span class="section-arrow open">▸</span>
+                </div>
+            `;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'section-content open';
+            contentDiv.innerHTML = content;
+            
+            header.addEventListener('click', () => {
+                const arrow = header.querySelector('.section-arrow');
+                if (contentDiv.classList.contains('open')) {
+                    contentDiv.classList.remove('open');
+                    arrow.classList.remove('open');
+                } else {
+                    contentDiv.classList.add('open');
+                    arrow.classList.add('open');
                 }
-            };
-
-            return React.createElement('div', { className: 'min-h-screen bg-gray-900 text-gray-300 font-mono p-4 sm:p-6 md:p-8' },
-                React.createElement('div', { className: 'max-w-4xl mx-auto' },
-                    React.createElement('header', { className: 'text-center mb-8 border-b-2 border-teal-500/30 pb-6' },
-                        React.createElement('h1', { className: 'text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-500' },
-                            '🎬 Cinematic Horror Story Generator'
-                        ),
-                        React.createElement('p', { className: 'mt-4 text-gray-400 max-w-2xl mx-auto' },
-                            'Produce a studio-ready deliverable for your next TikTok horror story.'
-                        )
-                    ),
-                    React.createElement('main', { className: 'text-center' },
-                        React.createElement('button', {
-                            onClick: handleGenerate,
-                            disabled: isLoading,
-                            className: 'bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold py-3 px-8 rounded-lg shadow-lg shadow-teal-500/20 transition-all duration-300 ease-in-out transform hover:scale-105 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100'
-                        }, isLoading ? 'Generating Script...' : 'Generate Story Script'),
-                        React.createElement('div', { className: 'mt-8' },
-                            isLoading && React.createElement(LoadingSpinner, { message: 'Generating Cinematic Script...' }),
-                            error && React.createElement('div', { className: 'mt-6 p-4 bg-red-900/50 border border-red-700 text-red-300 rounded-lg' }, error)
-                        )
-                    ),
-                    storyData && React.createElement(StoryDisplay, { data: storyData }),
-                    React.createElement('footer', { className: 'text-center mt-12 text-gray-600 text-sm' },
-                        React.createElement('p', null, 'Powered by Google Gemini. Designed for cinematic professionals.')
-                    )
-                )
-            );
+            });
+            
+            if (downloadData) {
+                const downloadBtn = header.querySelector('.download-btn');
+                downloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadTextAsFile(downloadData.content, downloadData.filename);
+                });
+            }
+            
+            section.appendChild(header);
+            section.appendChild(contentDiv);
+            
+            return section;
         }
 
-        function LoadingSpinner({ message = 'Generating...' }) {
-            return React.createElement('div', { className: 'flex flex-col items-center justify-center p-8' },
-                React.createElement('div', { className: 'spinner' }),
-                React.createElement('p', { className: 'mt-4 text-lg text-teal-300' }, message),
-                React.createElement('p', { className: 'text-sm text-gray-500' }, 'This may take a moment.')
-            );
+        function renderStory(data) {
+            const container = document.getElementById('storyContainer');
+            container.innerHTML = '';
+            container.style.display = 'block';
+            
+            container.className = 'story-container';
+            container.innerHTML = `<h1 class="story-title">🎬 Rule-Based Horror Story – ${data.title}</h1>`;
+            
+            // Section 1: Narration Script
+            const narrationContent = `
+                <h3 class="section-subtitle">🎙 NARRATION SCRIPT</h3>
+                <div>${data.narrationScript.map(line => `<p class="narration-line">${line}</p>`).join('')}</div>
+            `;
+            container.appendChild(createSection(
+                'Story Script (Narration Format)',
+                1,
+                '🧩',
+                narrationContent,
+                { content: data.narrationScript.join('\n\n'), filename: '01_Narration_Script.txt' }
+            ));
+            
+            // Section 2: Scenes
+            const scenesContent = data.scenes.map((scene, i) => `
+                <div class="scene-item">
+                    <h4 class="scene-title">Scene ${String(i + 1).padStart(2, '0')} — ${scene.title}</h4>
+                    <p class="scene-description">Description: ${scene.description} <span class="lens-info">[${scene.lens}]</span></p>
+                </div>
+            `).join('');
+            container.appendChild(createSection(
+                'Scene-by-Scene B-Roll Plan',
+                2,
+                '🧩',
+                scenesContent,
+                { 
+                    content: data.scenes.map((s, i) => `Scene ${String(i + 1).padStart(2, '0')} — ${s.title}\nDescription: ${s.description} [${s.lens}]`).join('\n\n'),
+                    filename: '02_B-Roll_Plan.txt'
+                }
+            ));
+            
+            // Section 3: Veo Prompts
+            const veoContent = data.veoPrompts.map((p, i) => `
+                <div class="prompt-box">
+                    <p class="prompt-label">Prompt ${i + 1}:</p>
+                    <p class="prompt-text">${p.prompt}</p>
+                    <p class="prompt-label" style="margin-top: 0.5rem;">Parameters:</p>
+                    <p class="param-text">${p.parameters}</p>
+                </div>
+            `).join('');
+            container.appendChild(createSection(
+                'Veo 3 Image Prompts (Optimized)',
+                3,
+                '🧩',
+                veoContent,
+                {
+                    content: data.veoPrompts.map((p, i) => `Prompt ${i + 1}:\n${p.prompt}\n\nParameters:\n${p.parameters}\n\nNegative Prompts:\n${NEGATIVE_PROMPTS}`).join('\n\n---\n\n'),
+                    filename: '03_Veo_Prompts.txt'
+                }
+            ));
+            
+            // Section 4: Music & SFX
+            const musicContent = `<ul>${data.musicAndSfxNotes.map(note => `<li>${note}</li>`).join('')}</ul>`;
+            container.appendChild(createSection(
+                'Music + SFX Design Notes',
+                4,
+                '🧩',
+                musicContent,
+                { content: data.musicAndSfxNotes.join('\n'), filename: '04_Music_SFX_Notes.txt' }
+            ));
+            
+            // Section 5: Voiceover Direction
+            const voContent = `<ul>${data.voiceoverDirection.map(note => `<li>${note}</li>`).join('')}</ul>`;
+            container.appendChild(createSection(
+                'Voiceover Direction',
+                5,
+                '🧩',
+                voContent,
+                { content: data.voiceoverDirection.join('\n'), filename: '05_Voiceover_Direction.txt' }
+            ));
+            
+            // Section 6: Viral Titles
+            const viralContent = `
+                <h4 class="section-subtitle">10 Title Options:</h4>
+                <ol>${data.viralTitles.map(title => `<li>${title}</li>`).join('')}</ol>
+                <h4 class="section-subtitle" style="margin-top: 1rem;">Hook Rewrite (First 5 seconds):</h4>
+                <p style="color: #9ca3af; font-style: italic; margin-top: 0.5rem;">"${data.viralHook}"</p>
+            `;
+            container.appendChild(createSection(
+                'Viral Title + Hook Options',
+                6,
+                '🧩',
+                viralContent,
+                {
+                    content: `10 Title Options:\n${data.viralTitles.join('\n')}\n\nHook Rewrite (First 5 seconds):\n"${data.viralHook}"`,
+                    filename: '06_Viral_Content.txt'
+                }
+            ));
+            
+            // Section 7: Thumbnail
+            const thumbnailContent = `
+                <div class="prompt-box">
+                    <p class="prompt-label">Thumbnail Prompt:</p>
+                    <p class="prompt-text">${data.thumbnailPrompt}</p>
+                </div>
+            `;
+            container.appendChild(createSection(
+                'Thumbnail Prompt',
+                7,
+                '🧩',
+                thumbnailContent,
+                { content: data.thumbnailPrompt, filename: '07_Thumbnail_Prompt.txt' }
+            ));
+            
+            // Section 8: Safety Disclaimer
+            const disclaimerContent = '<p class="disclaimer">This story and all visual elements are fictional. No real locations, persons, or organizations are depicted. All AI generations follow content safety standards.</p>';
+            container.appendChild(createSection('Safety Disclaimer', 8, '🧩', disclaimerContent));
+            
+            // Section 9: Export Controls
+            const exportContent = `
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="copy-btn" id="copyToClipboardBtn">
+                        <span id="copyIcon">📋</span>
+                        <span id="copyText">Copy to Clipboard</span>
+                    </button>
+                </div>
+            `;
+            container.appendChild(createSection('Export Controls', 9, '🧩', exportContent));
+            
+            // Add event listener for copy button
+            const copyBtn = document.getElementById('copyToClipboardBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    if (!window.currentStoryData) return;
+                    
+                    const clipboardText = formatStoryForClipboard(window.currentStoryData);
+                    navigator.clipboard.writeText(clipboardText).then(() => {
+                        const icon = document.getElementById('copyIcon');
+                        const textEl = document.getElementById('copyText');
+                        icon.textContent = '✅';
+                        textEl.textContent = 'Copied!';
+                        setTimeout(() => {
+                            icon.textContent = '📋';
+                            textEl.textContent = 'Copy to Clipboard';
+                        }, 2000);
+                    });
+                });
+            }
+            
+            // Section 10: Hashtags
+            const hashtagsContent = `<p class="hashtags">${data.hashtags.map(h => `#${h}`).join(' ')}</p>`;
+            container.appendChild(createSection(
+                'Viral Hashtags',
+                10,
+                '🧩',
+                hashtagsContent,
+                { content: data.hashtags.map(h => `#${h}`).join(' '), filename: '10_Viral_Hashtags.txt' }
+            ));
+            
+            // Store data for clipboard copy
+            window.currentStoryData = data;
         }
 
-        function Section({ title, sectionNumber, icon = '🧩', children, onDownload }) {
-            const [isOpen, setIsOpen] = React.useState(true);
-
-            return React.createElement('div', { className: 'mb-6 bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden' },
-                React.createElement('button', {
-                    onClick: () => setIsOpen(!isOpen),
-                    className: 'w-full p-4 flex justify-between items-center bg-gray-800 hover:bg-gray-700/50 transition-colors'
-                },
-                    React.createElement('h2', { className: 'text-xl font-bold text-teal-400 text-left flex-grow' },
-                        React.createElement('span', { className: 'text-gray-500' }, String(sectionNumber).padStart(2, '0')),
-                        ' ',
-                        icon,
-                        ' ',
-                        title
-                    ),
-                    React.createElement('div', { className: 'flex items-center gap-2' },
-                        onDownload && React.createElement('button', {
-                            onClick: (e) => {
-                                e.stopPropagation();
-                                onDownload();
-                            },
-                            className: 'p-2 rounded-full hover:bg-gray-600 transition-colors',
-                            title: `Download ${title}`
-                        }, '⬇️'),
-                        React.createElement('span', {
-                            className: 'text-teal-400 transform transition-transform duration-300 text-2xl leading-none',
-                            style: { transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }
-                        }, '▸')
-                    )
-                ),
-                isOpen && React.createElement('div', { className: 'p-4 md:p-6 border-t border-gray-700' }, children)
-            );
+        function formatStoryForClipboard(data) {
+            let text = `🎬 Rule-Based Horror Story – ${data.title}\n\n`;
+            text += `🧩 SECTION 1: Story Script (Narration Format)\n🎙 NARRATION SCRIPT\n${data.narrationScript.join('\n\n')}\n\n`;
+            text += `🎞 SECTION 2: Scene-by-Scene B-Roll Plan\n${data.scenes.map((s, i) => `Scene ${String(i + 1).padStart(2, '0')} — ${s.title}\nDescription: ${s.description} [${s.lens}]`).join('\n\n')}\n\n`;
+            text += `🖼 SECTION 3: Veo 3 Image Prompts (Optimized)\n${data.veoPrompts.map((p, i) => `Prompt ${i + 1}:\n${p.prompt}\nParameters:\n${p.parameters}`).join('\n\n')}\n\n`;
+            text += `🎵 SECTION 4: Music + SFX Design Notes\n${data.musicAndSfxNotes.join('\n')}\n\n`;
+            text += `🔊 SECTION 5: Voiceover Direction\n${data.voiceoverDirection.join('\n')}\n\n`;
+            text += `🧠 SECTION 6: Viral Title + Hook Options\nTitles:\n${data.viralTitles.join('\n')}\n\nHook Rewrite:\n${data.viralHook}\n\n`;
+            text += `🧩 SECTION 7: Thumbnail Prompt\n${data.thumbnailPrompt}\n\n`;
+            text += `⚠️ SECTION 8: Safety Disclaimer\nThis story and all visual elements are fictional. No real locations, persons, or organizations are depicted. All AI generations follow content safety standards.\n\n`;
+            text += `SECTION 10: Viral Hashtags\n${data.hashtags.map(h => `#${h}`).join(' ')}\n`;
+            return text;
         }
 
-        function StoryDisplay({ data }) {
-            const [copied, setCopied] = React.useState(false);
-
-            const downloadTextAsFile = (content, filename) => {
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            };
-
-            const formatStoryForClipboard = () => {
-                let text = `🎬 Rule-Based Horror Story – ${data.title}\n\n`;
-                text += `🧩 SECTION 1: Story Script (Narration Format)\n🎙 NARRATION SCRIPT\n${data.narrationScript.join('\n\n')}\n\n`;
-                text += `🎞 SECTION 2: Scene-by-Scene B-Roll Plan\n${data.scenes.map((s, i) => `Scene ${String(i + 1).padStart(2, '0')} — ${s.title}\nDescription: ${s.description} [${s.lens}]`).join('\n\n')}\n\n`;
-                text += `🖼 SECTION 3: Veo 3 Image Prompts (Optimized)\n${data.veoPrompts.map((p, i) => `Prompt ${i + 1}:\n${p.prompt}\nParameters:\n${p.parameters}`).join('\n\n')}\n\n`;
-                text += `🎵 SECTION 4: Music + SFX Design Notes\n${data.musicAndSfxNotes.join('\n')}\n\n`;
-                text += `🔊 SECTION 5: Voiceover Direction\n${data.voiceoverDirection.join('\n')}\n\n`;
-                text += `🧠 SECTION 6: Viral Title + Hook Options\nTitles:\n${data.viralTitles.join('\n')}\n\nHook Rewrite:\n${data.viralHook}\n\n`;
-                text += `🧩 SECTION 7: Thumbnail Prompt\n${data.thumbnailPrompt}\n\n`;
-                text += `⚠️ SECTION 8: Safety Disclaimer\nThis story and all visual elements are fictional. No real locations, persons, or organizations are depicted. All AI generations follow content safety standards.\n\n`;
-                text += `SECTION 10: Viral Hashtags\n${data.hashtags.map(h => `#${h}`).join(' ')}\n`;
-                return text;
-            };
-
-            const handleCopyToClipboard = () => {
-                const textToCopy = formatStoryForClipboard();
-                navigator.clipboard.writeText(textToCopy);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            };
-
-            return React.createElement('div', { className: 'mt-10 text-left bg-gray-900/50 p-4 sm:p-6 rounded-lg border-2 border-teal-500/30' },
-                React.createElement('h1', { className: 'text-2xl sm:text-3xl font-bold text-center mb-6 pb-4 border-b border-gray-700' },
-                    `🎬 Rule-Based Horror Story – ${data.title}`
-                ),
-
-                React.createElement(Section, {
-                    title: 'Story Script (Narration Format)',
-                    sectionNumber: 1,
-                    onDownload: () => downloadTextAsFile(data.narrationScript.join('\n\n'), '01_Narration_Script.txt')
-                },
-                    React.createElement('h3', { className: 'text-lg font-semibold mb-3 text-cyan-400' }, '🎙 NARRATION SCRIPT'),
-                    React.createElement('div', { className: 'whitespace-pre-wrap space-y-4' },
-                        data.narrationScript.map((line, index) =>
-                            React.createElement('p', { key: index }, line)
-                        )
-                    )
-                ),
-
-                React.createElement(Section, {
-                    title: 'Scene-by-Scene B-Roll Plan',
-                    sectionNumber: 2,
-                    onDownload: () => downloadTextAsFile(data.scenes.map((s, i) => `Scene ${String(i + 1).padStart(2, '0')} — ${s.title}\nDescription: ${s.description} [${s.lens}]`).join('\n\n'), '02_B-Roll_Plan.txt')
-                },
-                    data.scenes.map((scene, index) =>
-                        React.createElement('div', { key: index, className: 'mb-4 pb-4 border-b border-gray-700/50 last:border-b-0' },
-                            React.createElement('h4', { className: 'font-bold text-cyan-400' }, `Scene ${String(index + 1).padStart(2, '0')} — ${scene.title}`),
-                            React.createElement('p', { className: 'text-gray-400' },
-                                'Description: ',
-                                scene.description,
-                                ' ',
-                                React.createElement('span', { className: 'text-teal-400 font-semibold' }, `[${scene.lens}]`)
-                            )
-                        )
-                    )
-                ),
-
-                React.createElement(Section, {
-                    title: 'Veo 3 Image Prompts (Optimized)',
-                    sectionNumber: 3,
-                    onDownload: () => downloadTextAsFile(data.veoPrompts.map((p, i) => `Prompt ${i + 1}:\n${p.prompt}\n\nParameters:\n${p.parameters}\n\nNegative Prompts:\n${NEGATIVE_PROMPTS}`).join('\n\n---\n\n'), '03_Veo_Prompts.txt')
-                },
-                    data.veoPrompts.map((prompt, index) =>
-                        React.createElement('div', { key: index, className: 'mb-4 font-mono text-sm bg-black/30 p-3 rounded' },
-                            React.createElement('p', { className: 'font-bold text-cyan-400' }, `Prompt ${index + 1}:`),
-                            React.createElement('p', { className: 'text-gray-300 my-1' }, prompt.prompt),
-                            React.createElement('p', { className: 'font-bold text-cyan-400 mt-2' }, 'Parameters:'),
-                            React.createElement('p', { className: 'text-teal-300' }, prompt.parameters)
-                        )
-                    )
-                ),
-
-                React.createElement(Section, {
-                    title: 'Music + SFX Design Notes',
-                    sectionNumber: 4,
-                    onDownload: () => downloadTextAsFile(data.musicAndSfxNotes.join('\n'), '04_Music_SFX_Notes.txt')
-                },
-                    React.createElement('ul', { className: 'list-disc list-inside space-y-2 text-gray-400' },
-                        data.musicAndSfxNotes.map((note, i) =>
-                            React.createElement('li', { key: i }, note)
-                        )
-                    )
-                ),
-
-                React.createElement(Section, {
-                    title: 'Voiceover Direction',
-                    sectionNumber: 5,
-                    onDownload: () => downloadTextAsFile(data.voiceoverDirection.join('\n'), '05_Voiceover_Direction.txt')
-                },
-                    React.createElement('ul', { className: 'list-disc list-inside space-y-2 text-gray-400' },
-                        data.voiceoverDirection.map((note, i) =>
-                            React.createElement('li', { key: i }, note)
-                        )
-                    )
-                ),
-
-                React.createElement(Section, {
-                    title: 'Viral Title + Hook Options',
-                    sectionNumber: 6,
-                    onDownload: () => downloadTextAsFile(`10 Title Options:\n${data.viralTitles.join('\n')}\n\nHook Rewrite (First 5 seconds):\n"${data.viralHook}"`, '06_Viral_Content.txt')
-                },
-                    React.createElement('h4', { className: 'font-bold text-cyan-400' }, '10 Title Options:'),
-                    React.createElement('ul', { className: 'list-decimal list-inside my-2 pl-4 text-gray-400' },
-                        data.viralTitles.map((title, i) =>
-                            React.createElement('li', { key: i }, title)
-                        )
-                    ),
-                    React.createElement('h4', { className: 'font-bold text-cyan-400 mt-4' }, 'Hook Rewrite (First 5 seconds):'),
-                    React.createElement('p', { className: 'text-gray-400 italic mt-1' }, `"${data.viralHook}"`)
-                ),
-
-                React.createElement(Section, {
-                    title: 'Thumbnail Prompt',
-                    sectionNumber: 7,
-                    onDownload: () => downloadTextAsFile(data.thumbnailPrompt, '07_Thumbnail_Prompt.txt')
-                },
-                    React.createElement('div', { className: 'font-mono text-sm bg-black/30 p-3 rounded' },
-                        React.createElement('p', { className: 'font-bold text-cyan-400' }, 'Thumbnail Prompt:'),
-                        React.createElement('p', { className: 'text-gray-300 mt-1' }, data.thumbnailPrompt)
-                    )
-                ),
-
-                React.createElement(Section, { title: 'Safety Disclaimer', sectionNumber: 8 },
-                    React.createElement('p', { className: 'text-sm text-gray-500 italic' },
-                        'This story and all visual elements are fictional. No real locations, persons, or organizations are depicted. All AI generations follow content safety standards.'
-                    )
-                ),
-
-                React.createElement(Section, { title: 'Export Controls', sectionNumber: 9 },
-                    React.createElement('div', { className: 'space-y-3' },
-                        React.createElement('button', {
-                            onClick: handleCopyToClipboard,
-                            className: 'flex items-center text-gray-200 p-2 rounded-md bg-teal-600 hover:bg-teal-500 transition-colors'
-                        },
-                            React.createElement('span', null, copied ? '✅' : '📋'),
-                            React.createElement('span', { className: 'ml-2' }, copied ? 'Copied!' : 'Copy to Clipboard')
-                        )
-                    )
-                ),
-
-                React.createElement(Section, {
-                    title: 'Viral Hashtags',
-                    sectionNumber: 10,
-                    onDownload: () => downloadTextAsFile(data.hashtags.map(h => `#${h}`).join(' '), '10_Viral_Hashtags.txt')
-                },
-                    React.createElement('p', { className: 'text-cyan-300 break-words' },
-                        data.hashtags.map(h => `#${h}`).join(' ')
-                    )
-                )
-            );
-        }
-
-        // Load React from CDN
-        const script1 = document.createElement('script');
-        script1.crossOrigin = 'anonymous';
-        script1.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
-        
-        const script2 = document.createElement('script');
-        script2.crossOrigin = 'anonymous';
-        script2.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
-
-        script2.onload = () => {
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(React.createElement(App));
-        };
-
-        document.head.appendChild(script1);
-        document.head.appendChild(script2);
+        // Main event handler
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('generateBtn');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const errorContainer = document.getElementById('errorContainer');
+            const storyContainer = document.getElementById('storyContainer');
+            
+            btn.disabled = true;
+            loadingContainer.style.display = 'block';
+            errorContainer.style.display = 'none';
+            storyContainer.style.display = 'none';
+            
+            try {
+                const story = await generateHorrorStory();
+                renderStory(story);
+                setTimeout(() => {
+                    storyContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            } catch (err) {
+                errorContainer.className = 'error-box';
+                errorContainer.textContent = err.message;
+                errorContainer.style.display = 'block';
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                loadingContainer.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
