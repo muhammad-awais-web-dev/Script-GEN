@@ -768,8 +768,8 @@ Follow these constraints for the content:
                 copyBtn.addEventListener('click', () => {
                     if (!window.currentStoryData) return;
                     
-                    const text = formatStoryForClipboard(window.currentStoryData);
-                    navigator.clipboard.writeText(text).then(() => {
+                    const clipboardText = formatStoryForClipboard(window.currentStoryData);
+                    navigator.clipboard.writeText(clipboardText).then(() => {
                         const icon = document.getElementById('copyIcon');
                         const textEl = document.getElementById('copyText');
                         icon.textContent = '✅';
