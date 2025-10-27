@@ -601,7 +601,7 @@ Follow these constraints for the content:
                     ${icon} ${title}
                 </span>
                 <div class="section-actions">
-                    ${downloadData ? '<button class="download-btn" onclick="event.stopPropagation();">⬇️</button>' : ''}
+                    ${downloadData ? '<button class="download-btn">⬇️</button>' : ''}
                     <span class="section-arrow open">▸</span>
                 </div>
             `;
@@ -754,13 +754,33 @@ Follow these constraints for the content:
             // Section 9: Export Controls
             const exportContent = `
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <button class="copy-btn" onclick="copyStoryToClipboard()">
+                    <button class="copy-btn" id="copyToClipboardBtn">
                         <span id="copyIcon">📋</span>
                         <span id="copyText">Copy to Clipboard</span>
                     </button>
                 </div>
             `;
             container.appendChild(createSection('Export Controls', 9, '🧩', exportContent));
+            
+            // Add event listener for copy button
+            const copyBtn = document.getElementById('copyToClipboardBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    if (!window.currentStoryData) return;
+                    
+                    const text = formatStoryForClipboard(window.currentStoryData);
+                    navigator.clipboard.writeText(text).then(() => {
+                        const icon = document.getElementById('copyIcon');
+                        const textEl = document.getElementById('copyText');
+                        icon.textContent = '✅';
+                        textEl.textContent = 'Copied!';
+                        setTimeout(() => {
+                            icon.textContent = '📋';
+                            textEl.textContent = 'Copy to Clipboard';
+                        }, 2000);
+                    });
+                });
+            }
             
             // Section 10: Hashtags
             const hashtagsContent = `<p class="hashtags">${data.hashtags.map(h => `#${h}`).join(' ')}</p>`;
@@ -789,22 +809,6 @@ Follow these constraints for the content:
             text += `SECTION 10: Viral Hashtags\n${data.hashtags.map(h => `#${h}`).join(' ')}\n`;
             return text;
         }
-
-        window.copyStoryToClipboard = function() {
-            if (!window.currentStoryData) return;
-            
-            const text = formatStoryForClipboard(window.currentStoryData);
-            navigator.clipboard.writeText(text).then(() => {
-                const icon = document.getElementById('copyIcon');
-                const text = document.getElementById('copyText');
-                icon.textContent = '✅';
-                text.textContent = 'Copied!';
-                setTimeout(() => {
-                    icon.textContent = '📋';
-                    text.textContent = 'Copy to Clipboard';
-                }, 2000);
-            });
-        };
 
         // Main event handler
         document.getElementById('generateBtn').addEventListener('click', async () => {
