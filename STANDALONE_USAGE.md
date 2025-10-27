@@ -1,12 +1,18 @@
 # Standalone HTML Version - Usage Guide
 
-This repository includes a standalone HTML file (`standalone.html`) that allows you to use the Cinematic Horror Story Generator without running a development server or installing dependencies.
+This repository includes standalone HTML files that allow you to use the Cinematic Horror Story Generator without running a development server or installing dependencies.
 
-## Quick Start
+## 🌟 Recommended: Vanilla JavaScript Version
+
+**File:** `standalone-vanilla.html`
+
+This is the **recommended** standalone version. It uses pure vanilla JavaScript and CSS with no external dependencies (except for Google Fonts and the Gemini API).
+
+### Quick Start
 
 1. **Set Your API Key**
-   - Open `standalone.html` in a text editor
-   - Find the line near the top that says:
+   - Open `standalone-vanilla.html` in a text editor
+   - Find the line that says:
      ```javascript
      const HARDCODED_API_KEY = 'YOUR_API_KEY_HERE';
      ```
@@ -14,13 +20,19 @@ This repository includes a standalone HTML file (`standalone.html`) that allows 
    - Save the file
 
 2. **Open the File**
-   - Simply double-click `standalone.html` to open it in your default web browser
+   - Simply double-click `standalone-vanilla.html` to open it in your default web browser
    - Or right-click and select "Open with" to choose a specific browser
 
 3. **Generate Stories**
    - Click the "Generate Story Script" button
    - Wait for the AI to generate your horror story (this may take 10-30 seconds)
    - View and interact with the generated content
+
+## Alternative: React Version
+
+**File:** `standalone.html`
+
+This version uses React from CDN. It has the same features but requires external React libraries to load.
 
 ## Features
 

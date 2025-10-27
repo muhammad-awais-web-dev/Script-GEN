@@ -12,9 +12,9 @@ View your app in AI Studio: https://ai.studio/apps/drive/17lBtwCHdDmWp7VaH_iRX8V
 
 For the easiest way to use this app **with a single click**:
 
-1. Open `standalone.html` in a text editor
-2. Replace `'YOUR_API_KEY_HERE'` with your Gemini API key (around line 25)
-3. Save and double-click `standalone.html` to open in your browser
+1. Open `standalone-vanilla.html` in a text editor
+2. Replace `'YOUR_API_KEY_HERE'` with your Gemini API key (around line 270)
+3. Save and double-click `standalone-vanilla.html` to open in your browser
 4. Click "Generate Story Script" and enjoy!
 
 📖 See [STANDALONE_USAGE.md](STANDALONE_USAGE.md) for detailed instructions.
